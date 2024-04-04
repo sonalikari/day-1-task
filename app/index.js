@@ -4,12 +4,12 @@ const usersData = require('./sampleUsers');
 
 async function insertUsersData() {
   try {
-    const db = client.db('data'); 
+    const db = client.db('data');
     const usersCollection = db.collection('Users');
-    
+
     for (const userData of usersData) {
       userData.password = md5(userData.password);
-      
+
       const result = await usersCollection.insertOne(userData);
       console.log('User inserted:', result.insertedId);
 
@@ -29,8 +29,14 @@ async function insertUsersData() {
   }
 }
 
-connectToMongoDB().then(() => {
-  insertUsersData().then(() => {
+async function main() {
+  try {
+    await connectToMongoDB();
+    await insertUsersData();
     client.close();
-  });
-});
+  } catch (error) {
+    console.error('An error occurred:', error);
+  }
+}
+
+main();
